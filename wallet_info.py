@@ -75,13 +75,29 @@ def feg():
     print("Risposta tokenbalance:", response)
     quantita = float(response["balance"])
 
-    eth_val = float(response["eth_balance"])
     '''
     url = "https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD"
     response = requests.get(url, headers=headers).json()
     print("Risposta cryptocompare:", response)
     prezzo = float(response["USD"])
     '''
+
+    url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest'
+
+    parameters = {
+        'start': '1',
+        'limit': '5000',
+        'convert': 'USD'
+    }
+
+    headers = {
+        'Accepts': 'application/json',
+        'X-CMC_PRO_API_KEY': 'b54bcf4d-1bca-4e8e-9a24-22ff2c3d462c',
+    }
+
+    response = requests.get(url, params=parameters, headers=headers)
+    print(response)
+    print(response.json())
 
     totale = 0
 
@@ -112,7 +128,7 @@ def feg():
             driver_path = ".\chromedriver.exe"
             driver = webdriver.Chrome(executable_path=driver_path, options=options)
         else:
-            driver = webdriver.Chrome(execution_path=driver_path, options=options)
+            driver = webdriver.Chrome(executable_path=driver_path, options=options)
         driver.get(url)
 
         element_present = EC.element_to_be_clickable((By.CSS_SELECTOR, "li.pair-price"))
