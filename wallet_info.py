@@ -42,6 +42,7 @@ def feg():
     tentativi = 3
     while status >= 400 and tentativi >= 0:
         proxies = get_proxy()
+        print("Using proxy:", proxies)
         response = requests.get(url, headers=headers, proxies=proxies)
         status = response.status_code
         print("Status code:", status)
