@@ -65,7 +65,7 @@ def feg():
         options.add_argument('--disable-gpu')
         options.add_argument('--no-sandbox')
         options.add_argument('user-agent={0}'.format(user_agent))
-        options.binary_location = GOOGLE_CHROME_PATH
+        options.binary_location = GOOGLE_CHROME_BIN
 
         driver = webdriver.Chrome(execution_path=CHROMEDRIVER_PATH, options=options)
         driver.get(url)
