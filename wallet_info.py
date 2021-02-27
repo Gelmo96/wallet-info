@@ -5,8 +5,18 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from currency_converter import CurrencyConverter
+from fp.fp import FreeProxy
 import locale
 from os import environ
+
+def get_proxy():
+    proxy = FreeProxy(rand=True).get()
+    proxies = {}
+    if "https" in proxy:
+        proxies["https"] = proxy
+    else:
+        proxies["http"] = proxy
+    return proxies
 
 def feg():
     #https://etherscan.io/token/0x389999216860ab8e0175387a0c90e5c52522c945?a=0x0AA3B08BAFA836DAE445308D7F162aC8d5D8BEb3
@@ -18,24 +28,25 @@ def feg():
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) '
                       'Chrome/50.0.2661.102 Safari/537.36'})
 
-    '''
-    headers.update({
-        'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0'
-    })
-    
-    headers.update({
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) '
-                      'Chrome/39.0.2171.95 Safari/537.36'})
-    '''
+    proxies = get_proxy()
 
     #pagina del token
     url = "https://etherscan.io/token/" + token
     print("Requesting url:", url)
     print("using headers:", headers)
+    print("Using proxy:", proxies)
     # richiesta pagina web
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, proxies=proxies)
     status = response.status_code
     print("Status code:", status)
+    tentativi = 3
+    while status >= 400 and tentativi >= 0:
+        proxies = get_proxy()
+        response = requests.get(url, headers=headers, proxies=proxies)
+        status = response.status_code
+        print("Status code:", status)
+        tentativi -= 1
+
     if not status < 400:
         raise Exception('Web request failed')
     # parsing html
