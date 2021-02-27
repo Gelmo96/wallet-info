@@ -47,11 +47,21 @@ def feg():
         #https://www.dextools.io/app/uniswap/pair-explorer/0x854373387e41371ac6e307a1f29603c6fa10d872
         dextools_address = "0x854373387e41371ac6e307a1f29603c6fa10d872"
         url = "https://www.dextools.io/app/uniswap/pair-explorer/" + dextools_address
-        options = Options()
-        options.add_argument("--headless")
+
+
         user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.50 Safari/537.36'
+
+        GOOGLE_CHROME_PATH = '/app/.apt/usr/bin/google_chrome'
+        CHROMEDRIVER_PATH = '/app/.chromedriver/bin/chromedriver'
+
+        options = webdriver.ChromeOptions()
+        options.add_argument("--headless")
+        options.add_argument('--disable-gpu')
+        options.add_argument('--no-sandbox')
         options.add_argument('user-agent={0}'.format(user_agent))
-        driver = webdriver.Chrome(executable_path="./chromedriver.exe", options=options)
+        options.binary_location = GOOGLE_CHROME_PATH
+
+        driver = webdriver.Chrome(execution_path=CHROMEDRIVER_PATH, options=options)
         driver.get(url)
 
         element_present = EC.element_to_be_clickable((By.CSS_SELECTOR, "li.pair-price"))
