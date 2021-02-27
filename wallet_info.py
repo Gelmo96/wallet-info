@@ -62,7 +62,7 @@ def feg():
     c = CurrencyConverter()
     totale = c.convert(totale, 'USD', 'EUR')
 
-    locale.setlocale(locale.LC_ALL, 'German')
+    locale.setlocale(locale.LC_ALL, 'de_DE')
 
     result = {
         "quantita": "" + locale.format_string('%.2f', quantita, True),
