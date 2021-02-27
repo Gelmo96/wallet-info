@@ -27,16 +27,13 @@ def feg():
     headers.update({
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) '
                       'Chrome/50.0.2661.102 Safari/537.36'})
-
-    proxies = get_proxy()
-
+    '''
     #pagina del token
     url = "https://etherscan.io/token/" + token
     print("Requesting url:", url)
     print("using headers:", headers)
-    print("Using proxy:", proxies)
     # richiesta pagina web
-    response = requests.get(url, headers=headers, proxies=proxies)
+    response = requests.get(url, headers=headers)
     status = response.status_code
     print("Status code:", status)
     tentativi = 3
@@ -71,6 +68,25 @@ def feg():
     #<div id="ContentPlaceHolder1_divFilteredHolderValue" ... >
     totale = soup.find("div", attrs={"id": "ContentPlaceHolder1_divFilteredHolderValue"}).contents[4].split()[0]
     totale = float(totale[1:].strip())
+    '''
+
+    url = "https://api.tokenbalance.com/token/"+token+"/"+wallet
+    response = requests.get(url, headers=headers).json()
+    print("Risposta tokenbalance:", response)
+    quantita = float(response["balance"])
+
+    eth_val = float(response["eth_balance"])
+    '''
+    url = "https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD"
+    response = requests.get(url, headers=headers).json()
+    print("Risposta cryptocompare:", response)
+    prezzo = float(response["USD"])
+    '''
+
+    totale = 0
+
+    holders = "0"
+    perc = "0"
 
     if totale == 0:
         #https://www.dextools.io/app/uniswap/pair-explorer/0x854373387e41371ac6e307a1f29603c6fa10d872
@@ -85,9 +101,18 @@ def feg():
         options.add_argument('--disable-gpu')
         options.add_argument('--no-sandbox')
         options.add_argument('user-agent={0}'.format(user_agent))
-        options.binary_location = environ['GOOGLE_CHROME_BIN']
+        if environ.get('GOOGLE_CHROME_BIN') is None:
+            options.binary_location = "C:\Program Files\Google\Chrome\Application\chrome.exe"
+        else:
+            options.binary_location = environ.get('GOOGLE_CHROME_BIN')
 
-        driver = webdriver.Chrome(execution_path=environ['CHROMEDRIVER_PATH'], options=options)
+        driver_path = environ.get('CHROMEDRIVER_PATH')
+        driver = None
+        if driver_path is None:
+            driver_path = ".\chromedriver.exe"
+            driver = webdriver.Chrome(executable_path=driver_path, options=options)
+        else:
+            driver = webdriver.Chrome(execution_path=driver_path, options=options)
         driver.get(url)
 
         element_present = EC.element_to_be_clickable((By.CSS_SELECTOR, "li.pair-price"))
