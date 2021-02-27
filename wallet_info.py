@@ -6,6 +6,12 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from currency_converter import CurrencyConverter
 import locale
+import environ
+
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
 
 def feg():
     #https://etherscan.io/token/0x389999216860ab8e0175387a0c90e5c52522c945?a=0x0AA3B08BAFA836DAE445308D7F162aC8d5D8BEb3
@@ -65,9 +71,9 @@ def feg():
         options.add_argument('--disable-gpu')
         options.add_argument('--no-sandbox')
         options.add_argument('user-agent={0}'.format(user_agent))
-        options.binary_location = GOOGLE_CHROME_BIN
+        options.binary_location = env('GOOGLE_CHROME_BIN')
 
-        driver = webdriver.Chrome(execution_path=CHROMEDRIVER_PATH, options=options)
+        driver = webdriver.Chrome(execution_path=env('CHROMEDRIVER_PATH'), options=options)
         driver.get(url)
 
         element_present = EC.element_to_be_clickable((By.CSS_SELECTOR, "li.pair-price"))
