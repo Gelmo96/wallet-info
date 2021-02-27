@@ -1,4 +1,3 @@
-from flask import Flask
 from flask import Flask, render_template
 from wallet_info import feg
 
