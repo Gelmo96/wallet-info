@@ -13,15 +13,25 @@ def feg():
     wallet = "0x0AA3B08BAFA836DAE445308D7F162aC8d5D8BEb3"
     headers = requests.utils.default_headers()
     headers.update({
-        'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) '
+                      'Chrome/39.0.2171.95 Safari/537.36'})
+    '''
+    headers.update({
+        'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0'
     })
+    '''
 
     #pagina del token
     url = "https://etherscan.io/token/" + token
+    print("Requesting url:", url)
     # richiesta pagina web
-    html_content = requests.get(url, headers=headers).text
+    response = requests.get(url, headers=headers)
+    status = response.status_code
+    print("Status code:", status)
+    if not status < 400:
+        raise Exception('Web request failed')
     # parsing html
-    soup = BeautifulSoup(html_content, "lxml")
+    soup = BeautifulSoup(response.text, "lxml")
 
     #<div id="ContentPlaceHolder1_tr_tokenHolders">
     holders_list = soup.find("div", attrs={"id": "ContentPlaceHolder1_tr_tokenHolders"}).find("div", attrs={"class":"mr-3"})
