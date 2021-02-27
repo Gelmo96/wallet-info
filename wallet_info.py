@@ -51,9 +51,6 @@ def feg():
 
         user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.50 Safari/537.36'
 
-        GOOGLE_CHROME_PATH = '/app/.apt/usr/bin/google_chrome'
-        CHROMEDRIVER_PATH = '/app/.chromedriver/bin/chromedriver'
-
         options = webdriver.ChromeOptions()
         options.add_argument("--headless")
         options.add_argument('--disable-gpu')
