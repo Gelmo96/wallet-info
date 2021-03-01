@@ -25,7 +25,7 @@ def eth_price():
     return make_request(url)["AG"]["ETH-USDC"]["ask"]
 
 def gas_price():
-    environ.get('DEFIPULSE_KEY')
+    key = environ.get('DEFIPULSE_KEY')
     url = "https://data-api.defipulse.com/api/v1/egs/api/ethgasAPI.json?api-key=" + key
 
     res = make_request(url)
