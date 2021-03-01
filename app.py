@@ -10,7 +10,7 @@ def main():
     print("Dati ricevuti dal db:",db_data)
     time_old = datetime.datetime.strptime(db_data["data"], '%Y-%m-%d %H:%M:%S.%f')
     time_now = datetime.datetime.now()
-    diff = time_old - time_now
+    diff = time_now - time_old
     seconds_in_day = 24 * 60 * 60
     time_res = divmod(diff.days * seconds_in_day + diff.seconds, 60)
     minuti = "{}min {}s".format(abs(time_res[0]), time_res[1])
