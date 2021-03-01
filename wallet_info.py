@@ -8,20 +8,62 @@ from currency_converter import CurrencyConverter
 import locale
 from os import environ
 
-def feg():
-    #https://etherscan.io/token/0x389999216860ab8e0175387a0c90e5c52522c945?a=0x0AA3B08BAFA836DAE445308D7F162aC8d5D8BEb3
-    token = "0x389999216860ab8e0175387a0c90e5c52522c945"
-    wallet = "0x0AA3B08BAFA836DAE445308D7F162aC8d5D8BEb3"
+def make_request(url):
     headers = requests.utils.default_headers()
 
     headers.update({
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) '
                       'Chrome/50.0.2661.102 Safari/537.36'})
 
+    return requests.get(url, headers=headers).json()
+
+def eth_price():
+    key = environ.get('DEFIPULSE_KEY')
+    url = "https://data-api.defipulse.com/api/v1/dexag/markets?api-key=" + key
+
+    # ritorno il prezzo in USDC per un ETH
+    return make_request(url)["AG"]["ETH-USDC"]["ask"]
+
+def gas_price():
+    environ.get('DEFIPULSE_KEY')
+    url = "https://data-api.defipulse.com/api/v1/egs/api/ethgasAPI.json?api-key=" + key
+
+    res = make_request(url)
+    # costo medio di una quantità di gas in wei
+    gwei_cost = res["average"] / 10
+    print("costo di 1 gas in wei:", gwei_cost)
+    # costo in eth di un gas
+    eth = gwei_cost * (1 * 10 ** -9)
+    # costo di tutta la transazione in eth
+    # 200.000 ammontare medio di gas per una transazione di FEG
+    eth = float(eth * 200000)
+    eth_price_usd = float(eth_price())
+    print("eth_price", eth_price_usd)
+    transaction_cost = eth * eth_price_usd
+    print("total transaction cost", transaction_cost)
+    # tempo in minuti per completare la transazione
+    time_to_complete = res["avgWait"]
+    print("tempo esecuzione:", str(time_to_complete) + "minuti")
+
+    return {
+        "time_to_complete" : time_to_complete,
+        "transaction_cost" : transaction_cost
+    }
+
+def usd_to_eur(cash):
+    c = CurrencyConverter()
+    cash = c.convert(cash, 'USD', 'EUR')
+    return cash
+
+def feg():
+    #https://etherscan.io/token/0x389999216860ab8e0175387a0c90e5c52522c945?a=0x0AA3B08BAFA836DAE445308D7F162aC8d5D8BEb3
+    token = "0x389999216860ab8e0175387a0c90e5c52522c945"
+    wallet = "0x0AA3B08BAFA836DAE445308D7F162aC8d5D8BEb3"
+
     url = "https://api.tokenbalance.com/token/"+token+"/"+wallet
-    response = requests.get(url, headers=headers).json()
-    print("Risposta tokenbalance:", response)
+    response = make_request(url)
     quantita = float(response["balance"])
+    print("quantita", quantita)
 
     #https://www.dextools.io/app/uniswap/pair-explorer/0x854373387e41371ac6e307a1f29603c6fa10d872
     dextools_address = "0x854373387e41371ac6e307a1f29603c6fa10d872"
@@ -57,20 +99,38 @@ def feg():
     price = price.text[1:]
 
     totale = float(price) * float(quantita)
+    print("totale", totale)
     driver.quit()
 
-    c = CurrencyConverter()
-    totale = c.convert(totale, 'USD', 'EUR')
+    result = {
+        "quantita": quantita,
+        "totale": totale
+    }
+
+    return result
+
+def get_data():
+    feg_res = feg()
+    gas_res = gas_price()
+
+    print("feg_result", feg_res)
+    print("gas_result", gas_res)
+
+    roi = (feg_res["totale"] - gas_res["transaction_cost"]) / 3
+    roi = usd_to_eur(roi)
 
     locale.setlocale(locale.LC_ALL, 'de_DE')
 
     result = {
-        "quantita": "" + locale.format_string('%.2f', quantita, True),
-        "totale": "{0:.2f}€".format(totale)
+        "Quantita": "" + locale.format_string('%.2f', feg_res["quantita"], True),
+        "Totale wallet": "{0:.2f}€".format(feg_res["totale"]),
+        "Tempo esecuzione": str(gas_res["time_to_complete"])+"min",
+        "Costo gas": "{0:.2f}€".format(usd_to_eur(gas_res["transaction_cost"])),
+        "ROI individuale": "{0:.2f}€".format(roi),
     }
-
+    
     # we did it boys
-    if totale >= 350:
-        result["totale"] = result["totale"] + " \U0001F680\U0001F680\U0001F680"
+    if roi >= 116:
+        result["ROI individuale"] = result["ROI individuale"] + " \U0001F680\U0001F680\U0001F680"
 
     return result
