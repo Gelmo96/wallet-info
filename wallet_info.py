@@ -1,3 +1,8 @@
+import os
+import locale
+import database
+import datetime
+from apscheduler.schedulers.blocking import BlockingScheduler
 from bs4 import BeautifulSoup
 import requests
 from selenium import webdriver
@@ -5,8 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from currency_converter import CurrencyConverter
-import locale
-from os import environ
+
 
 def make_request(url):
     headers = requests.utils.default_headers()
@@ -18,14 +22,14 @@ def make_request(url):
     return requests.get(url, headers=headers).json()
 
 def eth_price():
-    key = environ.get('DEFIPULSE_KEY')
+    key = os.environ.get('DEFIPULSE_KEY')
     url = "https://data-api.defipulse.com/api/v1/dexag/markets?api-key=" + key
 
     # ritorno il prezzo in USDC per un ETH
     return make_request(url)["AG"]["ETH-USDC"]["ask"]
 
 def gas_price():
-    key = environ.get('DEFIPULSE_KEY')
+    key = os.environ.get('DEFIPULSE_KEY')
     url = "https://data-api.defipulse.com/api/v1/egs/api/ethgasAPI.json?api-key=" + key
 
     res = make_request(url)
@@ -76,18 +80,10 @@ def feg():
     options.add_argument('--disable-gpu')
     options.add_argument('--no-sandbox')
     options.add_argument('user-agent={0}'.format(user_agent))
-    if environ.get('GOOGLE_CHROME_BIN') is None:
-        options.binary_location = "C:\Program Files\Google\Chrome\Application\chrome.exe"
-    else:
-        options.binary_location = environ.get('GOOGLE_CHROME_BIN')
+    options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
 
-    driver_path = environ.get('CHROMEDRIVER_PATH')
-    driver = None
-    if driver_path is None:
-        driver_path = ".\chromedriver.exe"
-        driver = webdriver.Chrome(executable_path=driver_path, options=options)
-    else:
-        driver = webdriver.Chrome(executable_path=driver_path, options=options)
+    driver_path = os.environ.get('CHROMEDRIVER_PATH')
+    driver = webdriver.Chrome(executable_path=driver_path, options=options)
     driver.get(url)
 
     element_present = EC.element_to_be_clickable((By.CSS_SELECTOR, "li.pair-price"))
@@ -121,16 +117,35 @@ def get_data():
 
     locale.setlocale(locale.LC_ALL, 'de_DE')
 
+    monke = False
+    if roi >= 116:
+        monke = True
+
     result = {
-        "Quantita": "" + locale.format_string('%.2f', feg_res["quantita"], True),
-        "Totale wallet": "{0:.2f}€".format(feg_res["totale"]),
-        "Tempo esecuzione": str(gas_res["time_to_complete"])+"min",
-        "Costo gas": "{0:.2f}€".format(usd_to_eur(gas_res["transaction_cost"])),
-        "ROI individuale": "{0:.2f}€".format(roi),
+        "quantita": "" + locale.format_string('%.2f', feg_res["quantita"], True),
+        "totale": "{0:.2f}€".format(feg_res["totale"]),
+        "tempo": str(gas_res["time_to_complete"])+"min",
+        "costo": "{0:.2f}€".format(usd_to_eur(gas_res["transaction_cost"])),
+        "roi": "{0:.2f}€".format(roi),
+        "data": datetime.datetime.now(),
+        "monke": monke
     }
     
     # we did it boys
     if roi >= 116:
-        result["ROI individuale"] = result["ROI individuale"] + " \U0001F680\U0001F680\U0001F680"
+        result["roi"] = result["roi"] + " \U0001F680\U0001F680\U0001F680"
 
-    return result
+    database.write(result)
+
+sched = BlockingScheduler()
+
+@sched.scheduled_job('interval', minutes=5)
+def timed_job():
+    print("Eseguo wallet_info ", datetime.datetime.now())
+    get_data()
+
+'''
+# testing stuff
+get_data()
+print(database.read())
+'''

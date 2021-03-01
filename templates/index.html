@@ -11,7 +11,7 @@
 <body class="bg-dark" style="overflow-x: hidden">
     <table class="table table-dark w-100 p-3">
       <tbody>
-        {% for key, value in data.items() %}
+        {% for key, value in data["data"].items() %}
         <tr>
             <th scope="row"> {{ key }} </th>
             <td> {{ value }} </td>
@@ -19,10 +19,12 @@
         {% endfor %}
       </tbody>
     </table >
+    <p class="text-white ml-3">Dati aggiornati {{data["page_info"]["min"]}} fa.</p>
+    {% if data["page_info"]["monke"] %}
     <div class="row">
-        <div class="col-3">
+        <div class="col-2">
             <img src="https://media.tenor.com/images/7cc2a20f544e859564cca5584e723490/tenor.gif" class="w-100 h-auto"
-                 alt="volaaaaaaaaaa">
+                 alt="si volaaaaaaaaaa">
         </div>
         <div class="col-5">
             <img src="https://media1.tenor.com/images/605a98ca3fac10f697a3733291f97a97/tenor.gif" class="w-100 h-auto"
@@ -33,6 +35,22 @@
                  alt="si volaaaaaaaaaa">
         </div>
     </div>
+    {% else %}
+    <div class="row">
+        <div class="col-3">
+            <img src="https://media1.tenor.com/images/9836b3332d17c431da033d71264d817a/tenor.gif?itemid=13265101" class="w-100 h-auto"
+                 alt="reeeeeeeeeeee">
+        </div>
+        <div class="col-5">
+            <img src="https://media1.tenor.com/images/3f12335ee631466ff538f91ded871a63/tenor.gif?itemid=16886473" class="w-100 h-auto"
+                 alt="reeeeeeeeeeee">
+        </div>
+        <div class="col-3">
+            <img src="https://media1.tenor.com/images/9836b3332d17c431da033d71264d817a/tenor.gif?itemid=13265101" class="w-100 h-auto"
+                 alt="reeeeeeeeeeee">
+        </div>
+    </div>
+    {% endif %}
 </body>
 </html>
 
