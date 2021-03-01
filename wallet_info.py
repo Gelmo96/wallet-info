@@ -144,6 +144,8 @@ def timed_job():
     print("Eseguo wallet_info ", datetime.datetime.now())
     get_data()
 
+sched.start()
+
 '''
 # testing stuff
 get_data()

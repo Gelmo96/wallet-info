@@ -43,8 +43,7 @@ def read():
 
     return result
 
-
-
+'''
 #testing stuff
 data = {
     "quantita": "5.234.765.432,34",
@@ -57,3 +56,4 @@ data = {
 }
 write(data)
 print(read())
+'''
