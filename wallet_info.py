@@ -126,8 +126,10 @@ def get_data():
 
     database.write(result)
 
-sched = BlockingScheduler()
+# esegui subito prima di partire
+get_data()
 
+sched = BlockingScheduler()
 
 @sched.scheduled_job('interval', minutes=5)
 def timed_job():
