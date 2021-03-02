@@ -100,7 +100,7 @@ def feg():
 
     result = {
         "quantita": quantita,
-        "totale": totale
+        "totale_usd": totale
     }
 
     return result
@@ -112,32 +112,22 @@ def get_data():
     print("feg_result", feg_res)
     print("gas_result", gas_res)
 
-    roi = (feg_res["totale"] - gas_res["transaction_cost"]) / 3
-    roi = usd_to_eur(roi)
-
     locale.setlocale(locale.LC_ALL, 'de_DE')
-
-    monke = False
-    if roi >= 116:
-        monke = True
 
     result = {
         "quantita": "" + locale.format_string('%.2f', feg_res["quantita"], True),
-        "totale": "{0:.2f}€".format(feg_res["totale"]),
-        "tempo": str(gas_res["time_to_complete"])+"min",
-        "costo": "{0:.2f}€".format(usd_to_eur(gas_res["transaction_cost"])),
-        "roi": "{0:.2f}€".format(roi),
-        "data": datetime.datetime.now(),
-        "monke": monke
+        "totale_eur": "{0:.2f}".format(usd_to_eur(feg_res["totale_usd"])),
+        "totale_usd": "{0:.2f}".format(feg_res["totale_usd"]),
+        "tempo": str(gas_res["time_to_complete"]),
+        "gas_eur": "{0:.2f}".format(usd_to_eur(gas_res["transaction_cost"])),
+        "gas_usd": "{0:.2f}".format(gas_res["transaction_cost"]),
+        "data": datetime.datetime.now()
     }
-    
-    # we did it boys
-    if roi >= 116:
-        result["roi"] = result["roi"] + " \U0001F680\U0001F680\U0001F680"
 
     database.write(result)
 
 sched = BlockingScheduler()
+
 
 @sched.scheduled_job('interval', minutes=5)
 def timed_job():

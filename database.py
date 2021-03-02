@@ -13,27 +13,27 @@ def write(data):
     # se la linea è presente in tabella
     if cur.fetchone() is not None:
         sql = "UPDATE wallet \
-              SET quantita = %s, \
-              totale = %s, \
-              tempo = %s, \
-              costo = %s, \
-              roi = %s, \
-              data = %s, \
-              monke = %s \
-              WHERE id = 1"
+                SET quantita = %s, \
+                totale_eur = %s, \
+                totale_usd = %s, \
+                tempo = %s, \
+                gas_eur = %s, \
+                gas_usd = %s, \
+                data = %s \
+                WHERE id = 1"
     else:
-        sql = "INSERT INTO wallet (id, quantita, totale, tempo, costo, roi, data, monke) VALUES \
+        sql = "INSERT INTO wallet (id, quantita, totale_eur, totale_usd, tempo, gas_eur, gas_usd, data) VALUES \
               (1, %s, %s, %s, %s, %s, %s, %s);"
 
     cur = conn.cursor()
-    cur.execute(sql, (data["quantita"], data["totale"], data["tempo"], data["costo"],
-                      data["roi"], data["data"], data["monke"]))
+    cur.execute(sql, (data["quantita"], data["totale_eur"], data["totale_usd"], data["tempo"], data["gas_eur"],
+                      data["gas_usd"], data["data"]))
     conn.commit()
     cur.close()
 
 
 def read():
-    sql = "SELECT quantita, totale, tempo, costo, roi, data, monke FROM wallet WHERE id = 1"
+    sql = "SELECT quantita, totale_eur, totale_usd, tempo, gas_eur, gas_usd, data FROM wallet WHERE id = 1"
 
     cur = conn.cursor(cursor_factory=RealDictCursor)
     cur.execute(sql)
@@ -47,13 +47,13 @@ def read():
 #testing stuff
 data = {
     "quantita": "5.234.765.432,34",
-    "totale": "234632€",
+    "totale_eur": "234632€",
+    "totale_usd": "234632$",
     "tempo": "15min",
-    "costo": "12,34€",
-    "roi": "2999€",
+    "gas_eur": "12,34€",
+    "gas_usd": "12,34€",
     "data": "2021-03-01 18:42:21.62228",
-    "monke": "false"
-}
+    }
 write(data)
 print(read())
 '''

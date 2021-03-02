@@ -5,52 +5,20 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="{{url_for('static', filename='jquery.js') }}">\x3C/script>')</script>
+    <script type=text/javascript>
+        $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    </script>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <title>Wallet info</title>
+
 </head>
 <body class="bg-dark" style="overflow-x: hidden">
-    <table class="table table-dark w-100 p-3">
-      <tbody>
-        {% for key, value in data["data"].items() %}
-        <tr>
-            <th scope="row"> {{ key }} </th>
-            <td> {{ value }} </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table >
-    <p class="text-white ml-3">Dati aggiornati {{data["page_info"]["min"]}} fa.</p>
-    {% if data["page_info"]["monke"] %}
-    <div class="row">
-        <div class="col-3">
-            <img src="https://media.tenor.com/images/7cc2a20f544e859564cca5584e723490/tenor.gif" class="w-100 h-auto"
-                 alt="si volaaaaaaaaaa">
-        </div>
-        <div class="col-5">
-            <img src="https://media1.tenor.com/images/605a98ca3fac10f697a3733291f97a97/tenor.gif" class="w-100 h-auto"
-                 alt="si volaaaaaaaaaa">
-        </div>
-        <div class="col-3">
-            <img src="https://media.tenor.com/images/7cc2a20f544e859564cca5584e723490/tenor.gif" class="w-100 h-auto"
-                 alt="si volaaaaaaaaaa">
-        </div>
-    </div>
-    {% else %}
-    <div class="row">
-        <div class="col-3">
-            <img src="https://media1.tenor.com/images/9836b3332d17c431da033d71264d817a/tenor.gif?itemid=13265101" class="w-100 h-auto"
-                 alt="reeeeeeeeeeee">
-        </div>
-        <div class="col-5">
-            <img src="https://media1.tenor.com/images/3f12335ee631466ff538f91ded871a63/tenor.gif?itemid=16886473" class="w-100 h-auto"
-                 alt="reeeeeeeeeeee">
-        </div>
-        <div class="col-3">
-            <img src="https://media1.tenor.com/images/9836b3332d17c431da033d71264d817a/tenor.gif?itemid=13265101" class="w-100 h-auto"
-                 alt="reeeeeeeeeeee">
-        </div>
-    </div>
-    {% endif %}
+
+    <p class="text-white ml-3">Index page</p>
+
 </body>
 </html>
-
