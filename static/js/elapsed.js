@@ -1,4 +1,6 @@
 function date_str(time){
+    //fix different timezone
+    time.hour -= 1
 
     //i secondi sempre
     let str = "" + time.sec + "s ago."
