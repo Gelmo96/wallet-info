@@ -4,7 +4,7 @@ from flask import render_template
 
 def load():
     db_data = database.read()[0]
-    print("Dati ricevuti dal db:", db_data)
+    print("wallet_cero.load: dati ricevuti dal db:\t", db_data)
     time_old = datetime.datetime.strptime(db_data["data"], '%Y-%m-%d %H:%M:%S.%f')
 
     investimento_iniziale = 116

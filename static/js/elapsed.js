@@ -1,6 +1,4 @@
 function date_str(time){
-    //fix different timezone
-    time.hour -= 1
 
     //i secondi sempre
     let str = "" + time.sec + "s ago."
@@ -19,14 +17,13 @@ function date_str(time){
     }
     str = "Data updated " + str;
 
-    if(gen_link) {
-        let a = document.createElement('a');
-        a.innerText = "Refresh";
-        a.href = "javascript:window.location.href=window.location.href";
-        a.class = "text-white";
-        document.getElementById("refresh").appendChild(a);
-        gen_link = false;
+    let refresh = document.getElementById("refresh");
+    if (time.min >= 5 || time.hour > 0) {
+        refresh.style.display = "block";
+    } else {
+        refresh.style.display = "none";
     }
+
     return str;
 }
 
@@ -50,14 +47,14 @@ function calc_time(delta){
     }
 }
 
-let gen_link = true;
 let new_date = new Date;
+new_date.setHours(new_date.getHours()-1);
 
 let this_script = document.currentScript;
 let old_date_str = this_script.getAttribute("time");
 let old_date = new Date(old_date_str);
-console.log("Data old",old_date);
-console.log("Data new", new_date);
+console.log("Data old:",old_date);
+console.log("Data new:", new_date);
 
 // get total seconds between the times
 let total_seconds = Math.floor(Math.abs(new_date - old_date) / 1000);
