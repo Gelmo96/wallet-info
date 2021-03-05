@@ -72,31 +72,7 @@ def eth_price():
                 "price": float(price)
             }
         else:
-            print("eth_price: errore richiesta etherscan:\t", response.text)
-    except:
-        pass
-
-    # tentativo 2, scraping con selenium
-    try:
-        response = make_selenium_request(url, None)
-        if response.ok:
-            soup = BeautifulSoup(response.text, "lxml")
-
-            # <div id="ContentPlaceHolder1_tr_valuepertoken" class="border-bottom pb-1 mb-3" style="margin-top:-6px;">
-            # <span class="d-block">$1,560.2300</span>
-            # </div>
-            price_str = soup.find("div", attrs={"id": "ethPrice"}).find("span").contents[0].replace(",","")
-            # numero di qualsiasi lunghezza con o senza punto decimale
-            price = re.search("(\d*\.?\d+)", price_str).group()
-
-            print("eth_price: ok da etherscan")
-
-            return {
-                "ok": True,
-                "price": float(price)
-            }
-        else:
-            print("eth_price: errore richiesta etherscan:\t", response.text)
+            print("eth_price: errore richiesta etherscan:\t", response.status_code)
     except:
         pass
 
@@ -114,6 +90,28 @@ def eth_price():
         }
     except:
         print("eth_price: errore richiesta defipulse:\t", response.text)
+        pass
+
+
+    #tentativo 3: scraping da dextools
+    try:
+        # https://www.dextools.io/app/uniswap/pair-explorer/0x854373387e41371ac6e307a1f29603c6fa10d872
+        dextools_address = "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc"
+        url = "https://www.dextools.io/app/uniswap/pair-explorer/" + dextools_address
+
+        result = make_selenium_request(url, "li.pair-price")
+        soup = BeautifulSoup(result, "lxml")
+
+        # <li _ngcontent-idv-c93="" class="ng-tns-c93-2 pair-price text-right text-success ng-star-inserted" style=""> ... </li>
+        price = soup.find("li", attrs={"class": "pair-price"}).find("span")
+        price = price.text[1:]
+        print("eth_price: ok da dextools")
+        return {
+            "ok": True,
+            "content": price
+        }
+    except:
+        print("eth_price: errore richiesta defipulse:\t", response.status_code)
         pass
 
     # worst case scenario: ha fallito ogni richiesta
