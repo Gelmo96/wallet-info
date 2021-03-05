@@ -71,7 +71,7 @@ def eth_price():
                 "price": float(price)
             }
         else:
-            print("eth_price: errore richiesta etherscan")
+            print("eth_price: errore richiesta etherscan:\t", response.text)
     except:
         pass
 
