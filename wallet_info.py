@@ -40,8 +40,9 @@ def make_selenium_request(url, css_selector):
     driver = webdriver.Chrome(executable_path=driver_path, options=options)
     driver.get(url)
 
-    element_present = EC.element_to_be_clickable((By.CSS_SELECTOR, css_selector))
-    WebDriverWait(driver, 7).until(element_present)
+    if css_selector is not None:
+        element_present = EC.element_to_be_clickable((By.CSS_SELECTOR, css_selector))
+        WebDriverWait(driver, 7).until(element_present)
     result = driver.page_source
     driver.quit()
 
@@ -54,6 +55,30 @@ def eth_price():
     # tentativo 1, scraping
     try:
         response = make_request(url)
+        if response.ok:
+            soup = BeautifulSoup(response.text, "lxml")
+
+            # <div id="ContentPlaceHolder1_tr_valuepertoken" class="border-bottom pb-1 mb-3" style="margin-top:-6px;">
+            # <span class="d-block">$1,560.2300</span>
+            # </div>
+            price_str = soup.find("div", attrs={"id": "ethPrice"}).find("span").contents[0].replace(",","")
+            # numero di qualsiasi lunghezza con o senza punto decimale
+            price = re.search("(\d*\.?\d+)", price_str).group()
+
+            print("eth_price: ok da etherscan")
+
+            return {
+                "ok": True,
+                "price": float(price)
+            }
+        else:
+            print("eth_price: errore richiesta etherscan:\t", response.text)
+    except:
+        pass
+
+    # tentativo 2, scraping con selenium
+    try:
+        response = make_selenium_request(url, None)
         if response.ok:
             soup = BeautifulSoup(response.text, "lxml")
 
