@@ -86,7 +86,7 @@ def eth_price():
         print("eth_price: ok da API defipulse")
         return {
             "ok": True,
-            "content": json_data["AG"]["ETH-USDC"]["ask"]
+            "price": json_data["AG"]["ETH-USDC"]["ask"]
         }
     except:
         print("eth_price: errore richiesta defipulse:\t", response.text)
@@ -108,7 +108,7 @@ def eth_price():
         print("eth_price: ok da dextools")
         return {
             "ok": True,
-            "content": price
+            "price": price
         }
     except:
         print("eth_price: errore richiesta defipulse:\t", response.status_code)
