@@ -77,10 +77,9 @@ def eth_price():
         pass
 
     # tentativo 2: richiesta API defipulse
-    key = os.environ.get('DEFIPULSE_KEY')
-    url_2 = "https://data-api.defipulse.com/api/v1/dexag/markets?api-key=" + key
-
     try:
+        key = os.environ.get('DEFIPULSE_KEY')
+        url_2 = "https://data-api.defipulse.com/api/v1/dexag/markets?api-key=" + key
         response = make_request(url_2)
         json_data = response.json()
         print("eth_price: ok da API defipulse")
@@ -108,7 +107,7 @@ def eth_price():
         print("eth_price: ok da dextools")
         return {
             "ok": True,
-            "price": price
+            "price": price.replace(",","")
         }
     except:
         print("eth_price: errore richiesta defipulse:\t", response.status_code)
