@@ -18,7 +18,7 @@ function date_str(time){
     str = "Data updated " + str;
 
     let refresh = document.getElementById("refresh");
-    if (time.min >= 1 || time.hour > 0) {
+    if (time.min >= 5 || time.hour > 0) {
         refresh.style.display = "block";
     } else {
         refresh.style.display = "none";
