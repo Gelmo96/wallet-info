@@ -2,7 +2,7 @@ import database
 import datetime
 from flask import render_template
 
-def load():
+def load_page():
     db_data = database.read()[0]
     print("wallet_cero.load: dati ricevuti dal db:\t", db_data)
     time_old = datetime.datetime.strptime(db_data["data"], '%Y-%m-%d %H:%M:%S.%f')

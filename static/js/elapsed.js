@@ -18,7 +18,7 @@ function date_str(time){
     str = "Data updated " + str;
 
     let refresh = document.getElementById("refresh");
-    if (time.min >= 5 || time.hour > 0) {
+    if (time.min >= 1 || time.hour > 0) {
         refresh.style.display = "block";
     } else {
         refresh.style.display = "none";
@@ -46,6 +46,44 @@ function calc_time(delta){
         sec: seconds
     }
 }
+
+function refresh (e){
+    e.preventDefault();
+    $('img#loading').show();
+    $.getJSON('/collect_data',function(data) {
+
+        $('img#loading').hide();
+
+        if (!data["ok"]) {
+            $('span#error').show();
+            setTimeout(function () {
+                $('span#error').hide();
+            }, 5000);
+        } else {
+            location.reload();
+        }
+    });
+    return;
+}
+
+$('a#refresh').click(function(e) { return refresh(e) } );
+
+// on click bottone refresh data
+/*
+$('a#refresh').on('click', function(e) {
+    e.preventDefault()
+    $('span#loading').show()
+    $.getJSON('/collect_data',function(data) {
+        $('span#loading').hide()
+        if (!data["ok"]){
+            $('span#error').show();
+            setTimeout(function() = { $('span#error').hide() }, 5000);
+        }
+
+    });
+    return false;
+});
+*/
 
 let new_date = new Date;
 new_date.setHours(new_date.getHours()-1);

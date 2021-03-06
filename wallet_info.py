@@ -115,6 +115,7 @@ def eth_price():
         pass
 
     # worst case scenario: ha fallito ogni richiesta
+    print("eth_price: tutte le richieste fallite")
     return {
         "ok": False
     }
@@ -148,7 +149,10 @@ def gas_price():
 
     res_eth = eth_price()
     if not res_eth["ok"]:
-        return
+        return {
+            "ok": False
+        }
+
     print("gas_price: risposta da eth_price:\t", res_eth["price"])
 
     transaction_cost = float(eth) * float(res_eth["price"])
@@ -156,7 +160,7 @@ def gas_price():
 
     # tempo in minuti per completare la transazione
     time_to_complete = gas_res["avgWait"]
-    print("tempo esecuzione:", str(time_to_complete) + "minuti")
+    print("gas_price: tempo esecuzione:\t", str(time_to_complete) + "minuti")
 
     return {
         "ok": True,
@@ -207,13 +211,18 @@ def feg():
 
 
 def get_data():
+
     feg_res = feg()
     if not feg_res["ok"]:
-        return
+        return {
+            "ok": False
+        }
 
     gas_res = gas_price()
     if not gas_res["ok"]:
-        return
+        return {
+            "ok": False
+        }
 
     print("get_data: feg_result:\t", feg_res)
     print("get_data: gas_result:\t", gas_res)
@@ -235,20 +244,9 @@ def get_data():
 
     database.write(result)
 
-
-# esegui subito prima di partire
-get_data()
-# print(database.read())
-
-sched = BlockingScheduler()
-
-@sched.scheduled_job('interval', minutes=5)
-def timed_job():
-    print("Eseguo wallet_info ", datetime.datetime.now())
-    get_data()
-
-sched.start()
-
+    return {
+        "ok": True
+    }
 
 '''
 # testing stuff
