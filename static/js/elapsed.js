@@ -68,31 +68,20 @@ function refresh (e){
 
 $('a#refresh').click(function(e) { return refresh(e) } );
 
-// on click bottone refresh data
-/*
-$('a#refresh').on('click', function(e) {
-    e.preventDefault()
-    $('span#loading').show()
-    $.getJSON('/collect_data',function(data) {
-        $('span#loading').hide()
-        if (!data["ok"]){
-            $('span#error').show();
-            setTimeout(function() = { $('span#error').hide() }, 5000);
-        }
-
-    });
-    return false;
-});
-*/
 
 let new_date = new Date;
-new_date.setHours(new_date.getHours()-1);
-
+new_date.setHours(new_date.getHours()-2);
+/*
+let now = new Date;
+let new_date = Date.UTC(now.getUTCFullYear(),now.getUTCMonth(), now.getUTCDate() ,
+      now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds());
+*/
 let this_script = document.currentScript;
 let old_date_str = this_script.getAttribute("time");
 let old_date = new Date(old_date_str);
 console.log("Data old:",old_date);
 console.log("Data new:", new_date);
+
 
 // get total seconds between the times
 let total_seconds = Math.floor(Math.abs(new_date - old_date) / 1000);
