@@ -179,19 +179,31 @@ def feg():
     wallet = "0x0AA3B08BAFA836DAE445308D7F162aC8d5D8BEb3"
 
     # tentativo 1: richiesta ad API tokenbalance
+    tokenbalance_error = False
     url = "https://api.tokenbalance.com/token/" + token + "/" + wallet
-    response = make_request(url).json()
+    try:
+        response = make_request(url)
+        response = response.json()
 
-    if response["error"]:
-        print("feg: errore richiesta API tokenbalance")
+        if response["error"]:
+            print("feg: errore richiesta API tokenbalance")
+            tokenbalance_error = True
+        else:
+            print("feg: quantita ok from tokenbalance")
+            quantita = float(response["balance"])
+    except:
+        print("feg: errore richiesta tokenbalance API:\t", response.text)
+        tokenbalance_error = True
+        pass
 
+    if tokenbalance_error:
         # tentativo 2: scraping da ehterscan.io
         url = "https://etherscan.io/token/" + token + "?a=" + wallet
         result = make_request(url)
         soup = BeautifulSoup(result.text, "lxml")
         # <div id="ContentPlaceHolder1_divFilteredHolderBalance" ...>
         balance = soup.find("div", attrs={"id": "ContentPlaceHolder1_divFilteredHolderBalance"}).contents[2]
-        balance = balance.replace(",","").split()[0]
+        balance = balance.replace(",", "").split()[0]
         quantita = float(balance)
 
         if math.isnan(quantita) or quantita is 0:
@@ -200,9 +212,6 @@ def feg():
             }
         else:
             print("feg: quantita ok from etherscan")
-    else:
-        print("feg: quantita ok from tokenbalance")
-        quantita = float(response["balance"])
 
     print("feg: quantita", quantita)
 
