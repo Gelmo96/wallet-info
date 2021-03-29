@@ -202,11 +202,18 @@ def feg():
         result = make_request(url)
         soup = BeautifulSoup(result.text, "lxml")
         # <div id="ContentPlaceHolder1_divFilteredHolderBalance" ...>
-        balance = soup.find("div", attrs={"id": "ContentPlaceHolder1_divFilteredHolderBalance"}).contents[2]
+        balance = soup.find("div", attrs={"id": "ContentPlaceHolder1_divFilteredHolderBalance"})
+        if not balance:
+            print("feg: errore richiesta from etherscan")
+            return {
+                "ok": False
+            }
+        balance = balance.contents[2]
         balance = balance.replace(",", "").split()[0]
         quantita = float(balance)
 
         if math.isnan(quantita) or quantita is 0:
+            print("feg: errore richiesta from etherscan")
             return {
                 "ok": False
             }
