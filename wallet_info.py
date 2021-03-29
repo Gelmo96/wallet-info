@@ -2,9 +2,8 @@ import os
 import locale
 import database
 import datetime
-from dateutil import tz
+import math
 import re
-from apscheduler.schedulers.blocking import BlockingScheduler
 from bs4 import BeautifulSoup
 import requests
 from selenium import webdriver
@@ -135,7 +134,7 @@ def gas_price():
     https://etherscan.io/gastracker
     '''
 
-    #gas API request
+    # gas API request
     gas_res = make_request(url).json()
     # costo medio di una quantità di gas in wei
     gwei_cost = gas_res["average"] / 10
@@ -179,9 +178,31 @@ def feg():
     token = "0x389999216860ab8e0175387a0c90e5c52522c945"
     wallet = "0x0AA3B08BAFA836DAE445308D7F162aC8d5D8BEb3"
 
+    # tentativo 1: richiesta ad API tokenbalance
     url = "https://api.tokenbalance.com/token/" + token + "/" + wallet
     response = make_request(url).json()
-    quantita = float(response["balance"])
+
+    if response["error"]:
+        print("feg: errore richiesta API tokenbalance")
+
+        # tentativo 2: scraping da ehterscan.io
+        url = "https://etherscan.io/token/" + token + "?a=" + wallet
+        result = make_request(url)
+        soup = BeautifulSoup(result.text, "lxml")
+        # <div id="ContentPlaceHolder1_divFilteredHolderBalance" ...>
+        balance = soup.find("div", attrs={"id": "ContentPlaceHolder1_divFilteredHolderBalance"}).contents[2]
+        balance = balance.replace(",","").split()[0]
+        quantita = float(balance)
+
+        if math.isnan(quantita) or quantita is 0:
+            return {
+                "ok": False
+            }
+        else:
+            print("feg: quantita ok from etherscan")
+    else:
+        print("feg: quantita ok from tokenbalance")
+        quantita = float(response["balance"])
 
     print("feg: quantita", quantita)
 

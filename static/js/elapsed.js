@@ -68,14 +68,15 @@ function refresh (e){
 
 $('a#refresh').click(function(e) { return refresh(e) } );
 
-
+/*
+// metodo per prendere la data UTC sottranedo la timezone locale
 let new_date = new Date;
 new_date.setHours(new_date.getHours()-2);
-/*
-let now = new Date;
-let new_date = Date.UTC(now.getUTCFullYear(),now.getUTCMonth(), now.getUTCDate() ,
-      now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds());
 */
+let now = new Date;
+let new_date = new Date(now.getUTCFullYear(),now.getUTCMonth(), now.getUTCDate() ,
+      now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds());
+
 let this_script = document.currentScript;
 let old_date_str = this_script.getAttribute("time");
 let old_date = new Date(old_date_str);
