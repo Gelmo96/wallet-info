@@ -183,15 +183,17 @@ def feg():
     url = "https://api.tokenbalance.com/token/" + token + "/" + wallet
     try:
         response = make_request(url)
+        print(response)
         response = response.json()
 
-        if response["error"]:
+        if "error" in response:
             print("feg: errore richiesta API tokenbalance")
             tokenbalance_error = True
         else:
             print("feg: quantita ok from tokenbalance")
             quantita = float(response["balance"])
     except:
+        print(response)
         print("feg: errore richiesta tokenbalance API:\t", response.text)
         tokenbalance_error = True
         pass
