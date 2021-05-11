@@ -183,9 +183,9 @@ def feg():
     url = "https://api.tokenbalance.com/token/" + token + "/" + wallet
     try:
         response = make_request(url)
-        print(response)
         response = response.json()
 
+        # le API contengono la key errore solo se si verifica
         if "error" in response:
             print("feg: errore richiesta API tokenbalance")
             tokenbalance_error = True
@@ -214,6 +214,10 @@ def feg():
         balance = balance.replace(",", "").split()[0]
         quantita = float(balance)
 
+        # <div id="ContentPlaceHolder1_divFilteredHolderValue"
+        totale = soup.find("div", attrs={"id": "ContentPlaceHolder1_divFilteredHolderValue"})
+        totale = float(totale.contents[4].replace(",", "").split()[0].replace("$", ""))
+
         if math.isnan(quantita) or quantita is 0:
             print("feg: errore richiesta from etherscan")
             return {
@@ -221,6 +225,16 @@ def feg():
             }
         else:
             print("feg: quantita ok from etherscan")
+
+            if not math.isnan(totale) and totale > 0:
+                result = {
+                    "ok": True,
+                    "quantita": quantita,
+                    "totale_usd": totale
+                }
+
+                return result
+
 
     print("feg: quantita", quantita)
 
