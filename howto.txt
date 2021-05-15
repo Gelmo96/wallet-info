@@ -1,0 +1,14 @@
+.\venv\Scripts\Activate.ps1
+	entrare nel virtual environment 
+
+pip freeze > .\requirements.txt
+	aggiornare il file dei requirements (da dentro il venv)
+
+deactivate
+	uscire dal virtual environment
+
+git push heroku master
+	per fare deploy in automatico su heroku
+	
+git push origin master
+	pushare su github
