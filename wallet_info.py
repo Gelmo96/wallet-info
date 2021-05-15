@@ -23,7 +23,7 @@ def make_request(url):
     return requests.get(url, headers=headers)
 
 
-def make_selenium_request(url, css_selector):
+def make_selenium_request(url, type, selector):
     user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.50 ' \
                  'Safari/537.36 '
 
@@ -31,17 +31,28 @@ def make_selenium_request(url, css_selector):
     options.add_argument("--headless")
     options.add_argument('--disable-gpu')
     options.add_argument('--no-sandbox')
-    options.add_argument('user-agent={0}'.format(user_agent))
+    options.add_argument('--user-agent={0}'.format(user_agent))
+    options.add_argument("--user-data-dir=C:\\Users\\Fede\\AppData\\Local\\Google\\Chrome\\User Data")
+    options.add_argument("--profile-directory=Profile 1")
     options.add_experimental_option('excludeSwitches', ['enable-logging'])
     options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
 
     driver_path = os.environ.get('CHROMEDRIVER_PATH')
+
     driver = webdriver.Chrome(executable_path=driver_path, options=options)
     driver.get(url)
 
-    if css_selector is not None:
-        element_present = EC.element_to_be_clickable((By.CSS_SELECTOR, css_selector))
-        WebDriverWait(driver, 7).until(element_present)
+    if type == "XPATH":
+        if selector is not None:
+            element_present = EC.element_to_be_clickable((By.XPATH, selector))
+            WebDriverWait(driver, 7).until(element_present)
+    elif type == "CSS":
+        if selector is not None:
+            element_present = EC.element_to_be_clickable((By.CSS_SELECTOR, selector))
+            WebDriverWait(driver, 7).until(element_present)
+    else:
+        return "Errore"
+
     result = driver.page_source
     driver.quit()
 
@@ -60,7 +71,7 @@ def eth_price():
             # <div id="ContentPlaceHolder1_tr_valuepertoken" class="border-bottom pb-1 mb-3" style="margin-top:-6px;">
             # <span class="d-block">$1,560.2300</span>
             # </div>
-            price_str = soup.find("div", attrs={"id": "ethPrice"}).find("span").contents[0].replace(",","")
+            price_str = soup.find("div", attrs={"id": "ethPrice"}).find("span").contents[0].replace(",", "")
             # numero di qualsiasi lunghezza con o senza punto decimale
             price = re.search("(\d*\.?\d+)", price_str).group()
 
@@ -90,14 +101,13 @@ def eth_price():
         print("eth_price: errore richiesta defipulse:\t", response.text)
         pass
 
-
-    #tentativo 3: scraping da dextools
+    # tentativo 3: scraping da dextools
     try:
         # https://www.dextools.io/app/uniswap/pair-explorer/0x854373387e41371ac6e307a1f29603c6fa10d872
         dextools_address = "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc"
         url = "https://www.dextools.io/app/uniswap/pair-explorer/" + dextools_address
 
-        result = make_selenium_request(url, "li.pair-price")
+        result = make_selenium_request(url, "CSS", "li.pair-price")
         soup = BeautifulSoup(result, "lxml")
 
         # <li _ngcontent-idv-c93="" class="ng-tns-c93-2 pair-price text-right text-success ng-star-inserted" style=""> ... </li>
@@ -106,7 +116,7 @@ def eth_price():
         print("eth_price: ok da dextools")
         return {
             "ok": True,
-            "price": price.replace(",","")
+            "price": price.replace(",", "")
         }
     except:
         print("eth_price: errore richiesta defipulse:\t", response.status_code)
@@ -178,6 +188,22 @@ def feg():
     token = "0x389999216860ab8e0175387a0c90e5c52522c945"
     wallet = "0x0AA3B08BAFA836DAE445308D7F162aC8d5D8BEb3"
 
+    # https://fegtrack.app/
+    url = "https://fegtrack.app/"
+
+    xpath = "//div[contains(text(), '$')]"
+    result = make_selenium_request(url, "XPATH", xpath)
+    soup = BeautifulSoup(result, "lxml")
+
+    balance = soup.find(string="Total FEG balance").parent.parent.contents[1]
+    quantita = float(balance.text.replace(",",""))
+
+    #soup.find_all(string=re.compile("^\$.*"))
+    # totale, market_cap, eth_usd, volume_24h, current_price
+
+    totale = float(soup.find_all(string=re.compile("^\$.*"))[0].replace(",", "").replace("$", ""))
+
+    '''
     # tentativo 1: richiesta ad API tokenbalance
     tokenbalance_error = False
     url = "https://api.tokenbalance.com/token/" + token + "/" + wallet
@@ -235,14 +261,13 @@ def feg():
 
                 return result
 
-
     print("feg: quantita", quantita)
 
     # https://www.dextools.io/app/uniswap/pair-explorer/0x854373387e41371ac6e307a1f29603c6fa10d872
     dextools_address = "0x854373387e41371ac6e307a1f29603c6fa10d872"
     url = "https://www.dextools.io/app/uniswap/pair-explorer/" + dextools_address
 
-    result = make_selenium_request(url, "li.pair-price")
+    result = make_selenium_request(url, "CSS", "li.pair-price")
     soup = BeautifulSoup(result, "lxml")
 
     # <li _ngcontent-idv-c93="" class="ng-tns-c93-2 pair-price text-right text-success ng-star-inserted" style=""> ... </li>
@@ -252,7 +277,7 @@ def feg():
 
     totale = float(price) * float(quantita)
     print("feg: totale nel wallet:\t", totale)
-
+    '''
     result = {
         "ok": True,
         "quantita": quantita,
@@ -263,7 +288,6 @@ def feg():
 
 
 def get_data():
-
     feg_res = feg()
     if not feg_res["ok"]:
         return {
